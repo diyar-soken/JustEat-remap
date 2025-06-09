@@ -10,11 +10,11 @@ public class Alimento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String nome;
-    private double costo;
+    private Double costo;
+
     @ElementCollection
-    private List<String> ingredienti = new ArrayList<>();
+    private List<String> ingredienti;
 
     public Long getId() {
         return id;

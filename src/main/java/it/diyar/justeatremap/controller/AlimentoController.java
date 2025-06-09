@@ -3,43 +3,55 @@ package it.diyar.justeatremap.controller;
 
 import it.diyar.justeatremap.models.Alimento;
 import it.diyar.justeatremap.repository.AlimentoRepository;
+import it.diyar.justeatremap.services.AlimentoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:4200")
 @RestController
-@RequestMapping("/api/alimento")
+@RequestMapping("/api/alimenti")
 public class AlimentoController {
     @Autowired
-    private AlimentoRepository repo;
+    private AlimentoService alimentoService;
 
     @GetMapping
-    private List<Alimento> getAllAlimenti(){
-        return repo.findAll();
+    public List<Alimento> getAll() {
+        return alimentoService.getAll();
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity updateAlimento(@PathVariable Long id, @RequestBody Alimento alimento){
-        Alimento alimentoToUpdate = repo.findById(id).orElseThrow();
-        alimentoToUpdate.setNome(alimento.getNome());
-        alimentoToUpdate.setCosto(alimento.getCosto());
-        alimentoToUpdate.setIngredienti(alimento.getIngredienti());
-        repo.save(alimentoToUpdate);
-        return ResponseEntity.ok(alimentoToUpdate);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity deleteAlimento(@PathVariable Long id){
-        Alimento alimentoToDelete = repo.findById(id).orElseThrow();
-        repo.delete(alimentoToDelete);
-        return ResponseEntity.ok().build();
+    @GetMapping("/{id}")
+    public ResponseEntity<Alimento> getById(@PathVariable Long id) {
+        return alimentoService.getById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Alimento aggiungiAlimento(@RequestBody Alimento alimento){
-        return repo.save(alimento);
+    public Alimento create(@RequestBody Alimento alimento) {
+        return alimentoService.save(alimento);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Alimento> update(@PathVariable Long id, @RequestBody Alimento alimentoDetails) {
+        Optional<Alimento> optionalAlimento = alimentoService.getById(id);
+        if (optionalAlimento.isPresent()) {
+            Alimento alimento = optionalAlimento.get();
+            alimento.setNome(alimentoDetails.getNome());
+            alimento.setCosto(alimentoDetails.getCosto());
+            alimento.setIngredienti(alimentoDetails.getIngredienti());
+            alimentoService.save(alimento);
+            return ResponseEntity.ok(alimento);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        alimentoService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
