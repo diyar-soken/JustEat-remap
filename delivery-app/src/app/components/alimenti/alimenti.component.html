@@ -1,0 +1,42 @@
+<h2>Gestione Alimenti</h2>
+
+<!-- Lista -->
+<div *ngIf="modo === 'lista'">
+  <button (click)="nuova()">Nuovo Alimento</button>
+  <table>
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nome</th>
+      <th>Prezzo</th>
+      <th>Azioni</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let alimento of alimenti">
+      <td>{{ alimento.id }}</td>
+      <td>{{ alimento.nome }}</td>
+      <td>{{ alimento.costo | currency }}</td>
+      <td>
+        <button (click)="modifica(alimento)">Modifica</button>
+        <button (click)="elimina(alimento.id)">Elimina</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Form -->
+<div *ngIf="modo !== 'lista'">
+  <h3>{{ modo === 'nuovo' ? 'Nuovo Alimento' : 'Modifica Alimento' }}</h3>
+  <form (ngSubmit)="salva()">
+    <label>Nome:</label>
+    <input [(ngModel)]="alimentoSelezionato!.nome" name="nome" required />
+
+    <label>Prezzo:</label>
+    <input type="number" [(ngModel)]="alimentoSelezionato!.costo" name="prezzo" required />
+
+    <button type="submit">Salva</button>
+    <button type="button" (click)="annulla()">Annulla</button>
+  </form>
+</div>
